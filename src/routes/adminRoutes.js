@@ -22,22 +22,6 @@ adminRouter.delete('/provinces/:id', adminController.deleteProvince);
 
 /**
  * =====================================================================================
- *                              ZONES CRUD
- * =====================================================================================
- */
-
-adminRouter.get('/zones', adminController.zoneList);
-
-adminRouter.get('/zones/:id', adminController.zoneDetail);
-
-adminRouter.post('/zones/register', adminController.createZone);
-
-adminRouter.put('/zones/:id', adminController.updateZone);
-
-adminRouter.delete('/zones/:id', adminController.deleteZone);
-
-/**
- * =====================================================================================
  *                              DISTRICTS CRUD
  * =====================================================================================
  */
@@ -57,5 +41,15 @@ adminRouter.delete('/districts/:id', adminController.deleteDistrict);
  *                              MUNICIPALITY CRUD
  * =====================================================================================
  */
+
+adminRouter.get('/municipalities', adminController.municipalityList);
+
+adminRouter.get('/municipalities/:id', adminController.municipalityDetail);
+
+adminRouter.post('/municipalities/register', adminController.createMunicipality);
+
+adminRouter.put('/municipalities/:id', adminController.updateMunicipality);
+
+adminRouter.delete('/municipalities/:id', adminController.deleteMunicipality);
 
 module.exports = adminRouter;
