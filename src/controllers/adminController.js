@@ -194,7 +194,7 @@ exports.deleteDistrict = function deleteDistrict(req, res, next) {
 
 // method to get municipality list
 exports.municipalityList = function municipalityList(req, res, next) {
-  Municipality.find(req.query, '_id name d_id').exec((err, municipality) => {
+  Municipality.find(req.query, '_id name type d_id').exec((err, municipality) => {
     if (err) { return next(err); }
     res.status(http.OK).send(municipality);
     return municipality;
@@ -203,7 +203,7 @@ exports.municipalityList = function municipalityList(req, res, next) {
 
 // method to get municipality detail
 exports.municipalityDetail = function municipalityList(req, res, next) {
-  Municipality.findById({ _id: req.params.id }, '_id name d_id').exec((err, municipality) => {
+  Municipality.findById({ _id: req.params.id }, '_id name type d_id').exec((err, municipality) => {
     if (err) {
       res.status(400).send({ status: 'error', name: 'ID Validation error', message: 'Invalid ID' });
       return next(err);
@@ -221,12 +221,13 @@ exports.municipalityDetail = function municipalityList(req, res, next) {
 exports.createMunicipality = function createMunicipality(req, res, next) {
   const municipality = new Municipality({
     name: req.body.name,
+    type: req.body.type,
     d_id: req.body.d_id
   });
-  Municipality.findOne({ name: req.body.name }).exec((err, data) => {
+  Municipality.findOne({ name: req.body.name, d_id: req.body.d_id }).exec((err, data) => {
     if (err) { return next(err); }
     if (data) {
-      res.status(http.BADREQUEST).send({ status: 'error', message: `municipality with name ${req.body.name} already exists` });
+      res.status(http.BADREQUEST).send({ status: 'error', message: `municipality '${req.body.name}' already exists` });
     } else {
       District.findOne({ _id: req.body.d_id }).exec((dErr, dData) => {
         if (dErr) { return next(dErr); }
@@ -254,15 +255,16 @@ exports.updateMunicipality = function updateMunicipality(req, res, next) {
   debug(req.body);
   District.findOne({ _id: req.body.d_id }).exec((dErr, district) => {
     if (district) {
-      Municipality.findOneAndUpdate({ _id: req.params.id }, { $set: req.body }, (err, municipality) => {
-        if (err) { return next(err); }
-        if (municipality != null) {
-          res.status(http.OK).send({ status: 'success', message: 'Successfully Updated', id: req.params.id });
-        } else {
-          res.status(http.NOTFOUND).send({ status: 'error', message: `municipality with id ${req.params.id} not found` });
-        }
-        return null;
-      });
+      Municipality.findOneAndUpdate({ _id: req.params.id }, { $set: req.body },
+        (err, municipality) => {
+          if (err) { return next(err); }
+          if (municipality != null) {
+            res.status(http.OK).send({ status: 'success', message: 'Successfully Updated', id: req.params.id });
+          } else {
+            res.status(http.NOTFOUND).send({ status: 'error', message: `municipality with id ${req.params.id} not found` });
+          }
+          return null;
+        });
     } else {
       res.status(http.BADREQUEST).send({ status: 'error', message: 'district doesnot exists' });
     }
