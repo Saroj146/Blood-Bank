@@ -28,20 +28,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.set('views', './src/views');
 
-const nav = [{}];
-const adminRouter = require('./src/routes/adminRoutes');
-const donorRouter = require('./src/routes/donorRoutes')(nav);
-const bloodbankRouter = require('./src/routes/bloodbankRoutes')(nav);
-const hospitalRouter = require('./src/routes/hospitalRoutes')(nav);
+const routes = require('./src/routes/routes');
+app.use('/', routes);
 
-app.use('/admin', adminRouter);
-app.use('/donors', donorRouter);
-app.use('/bloodbanks', bloodbankRouter);
-app.use('/hospitals', hospitalRouter);
-
-app.get('/', (req, res) => {
-  res.send(path.join(__dirname, 'app.js'));
-});
+// app.get('/', (req, res) => {
+//   res.send(path.join(__dirname, 'app.js'));
+// });
 
 app.listen(port, () => {
   debug(`Listening to port ${chalk.cyan(port)}`);

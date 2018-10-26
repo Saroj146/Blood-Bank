@@ -4,6 +4,13 @@ const adminController = require('../controllers/adminController');
 
 const adminRouter = express.Router();
 
+adminRouter.get('/', function(req, res){
+  res.json({
+    status: 'success',
+    message: 'This is admin panel...'
+  });
+});
+
 /**
  * =====================================================================================
  *                              PROVINCES CRUD
