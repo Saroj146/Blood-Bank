@@ -17,6 +17,8 @@ adminRouter.get('/', function(req, res){
  * =====================================================================================
  */
 
+adminRouter.get('/async', adminController.provinceListAsync);
+
 adminRouter.get('/provinces', adminController.provinceList);
 
 adminRouter.get('/provinces/:id', adminController.provinceDetail);
@@ -26,6 +28,8 @@ adminRouter.post('/provinces/register', adminController.createProvince);
 adminRouter.put('/provinces/:id', adminController.updateProvince);
 
 adminRouter.delete('/provinces/:id', adminController.deleteProvince);
+
+adminRouter.post('/provinces/csvupload', adminController.provinceCSVUpload);
 
 /**
  * =====================================================================================
