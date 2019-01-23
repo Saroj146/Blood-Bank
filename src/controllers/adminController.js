@@ -27,26 +27,42 @@ exports.provinceListAsync = async function provinceListAsync(req, res){
 
 // method to get province list
 exports.provinceList = function provinceList(req, res, next) {
-  Province.find({}, '_id name number').exec((err, provinces) => {
-    if (err) { return next(err); }
+  // Province.find({}, '_id name number').exec((err, provinces) => {
+  //   if (err) { return next(err); }
+  //   res.status(httpStatus.OK).send(provinces);
+  //   return provinces;
+  // });
+  Province.find({}, '_id name number').exec()
+  .then(provinces => {
     res.status(httpStatus.OK).send(provinces);
-    return provinces;
+  }).catch(error => {
+    res.status(httpStatus.NOTFOUND).send(error.message);
   });
 };
 
 // method to get province detail
 exports.provinceDetail = function provinceList(req, res, next) {
-  Province.findById({ _id: req.params.id }, '_id name number').exec((err, province) => {
-    if (err) {
-      res.status(400).send({ status: 'error', name: 'ID Validation error', message: 'Invalid ID' });
-      return next(err);
-    }
+  // Province.findById({ _id: req.params.id }, '_id name number').exec((err, province) => {
+  //   if (err) {
+  //     res.status(400).send({ status: 'error', name: 'ID Validation error', message: 'Invalid ID' });
+  //     return next(err);
+  //   }
+  //   if (!province) {
+  //     res.status(httpStatus.NOTFOUND).send({ message: 'Province not found' });
+  //   } else {
+  //     res.status(httpStatus.OK).send(province);
+  //   }
+  //   return province;
+  // });
+  Province.findById({ _id: req.params.id }, '_id name number').exec()
+  .then(province => {
     if (!province) {
       res.status(httpStatus.NOTFOUND).send({ message: 'Province not found' });
     } else {
       res.status(httpStatus.OK).send(province);
     }
-    return province;
+  }).catch(error => {
+    res.status(httpStatus.BADREQUEST).send(error.message);
   });
 };
 
