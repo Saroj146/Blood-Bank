@@ -27,33 +27,20 @@ exports.provinceListAsync = async function provinceListAsync(req, res){
 
 // method to get province list
 exports.provinceList = function provinceList(req, res, next) {
-  // Province.find({}, '_id name number').exec((err, provinces) => {
-  //   if (err) { return next(err); }
-  //   res.status(httpStatus.OK).send(provinces);
-  //   return provinces;
-  // });
   Province.find({}, '_id name number').exec()
   .then(provinces => {
-    res.status(httpStatus.OK).send(provinces);
+    if(provinces.length == 0){
+      res.status(httpStatus.NOTFOUND).send();
+    }else{
+      res.status(httpStatus.OK).send(provinces);
+    }
   }).catch(error => {
-    res.status(httpStatus.NOTFOUND).send(error.message);
+    res.status(httpStatus.BADREQUEST).send(error.message);
   });
 };
 
 // method to get province detail
 exports.provinceDetail = function provinceList(req, res, next) {
-  // Province.findById({ _id: req.params.id }, '_id name number').exec((err, province) => {
-  //   if (err) {
-  //     res.status(400).send({ status: 'error', name: 'ID Validation error', message: 'Invalid ID' });
-  //     return next(err);
-  //   }
-  //   if (!province) {
-  //     res.status(httpStatus.NOTFOUND).send({ message: 'Province not found' });
-  //   } else {
-  //     res.status(httpStatus.OK).send(province);
-  //   }
-  //   return province;
-  // });
   Province.findById({ _id: req.params.id }, '_id name number').exec()
   .then(province => {
     if (!province) {
@@ -73,47 +60,45 @@ exports.createProvince = function createProvince(req, res, next) {
     name: req.body.name,
     number: req.body.number
   });
-  province.save((err) => {
-    if (err) {
-      res.status(httpStatus.BADREQUEST).send({ name: err.name, message: err.message });
-      return next(err);
-    }
-    res.status(httpStatus.CREATED).send({ status: 'success', message: 'Created Successfully', id: province._id });
-    return province;
+  province.save().then(result => {
+    res.status(httpStatus.CREATED).send({ status: 'success', message: 'Created Successfully', id: result._id });
+  }).catch(error => {
+    res.status(httpStatus.BADREQUEST).send({ name: error.name, message: error.message });
   });
 };
 
 // method to update province
 exports.updateProvince = function updateProvince(req, res, next) {
-  Province.findOneAndUpdate({ _id: req.params.id }, { $set: req.body }, (err, province) => {
-    if (err) {
-      res.status(httpStatus.BADREQUEST).send({ name: err.name, message: err.message });
-      return next(err);
-    }
-    if (province == null) {
-      res.status(httpStatus.NOTFOUND).send({ status: 'error', message: `${req.params.id} not found` });
-    }
-    res.status(httpStatus.OK).send({ status: 'success', message: 'Successfully Updated', id: req.params.id });
-    return null;
-  });
+  Province.findOneAndUpdate({ _id: req.params.id }, { $set: req.body }).exec()
+    .then(result => {
+      if(result){
+        res.status(httpStatus.OK).send({ status: 'success', message: 'Successfully Updated', data: null });
+      }else{
+        res.status(httpStatus.NOTFOUND).send();
+      }
+    }).catch(error => {
+      res.status(httpStatus.BADREQUEST).send({ name: error.name, message: error.message });
+    });
 };
 
 // method to delete province
 exports.deleteProvince = function deleteProvince(req, res, next) {
-  Province.deleteOne({ _id: req.params.id }, (err, province) => {
-    debug(province);
-    if (err) {
-      res.status(httpStatus.BADREQUEST).send(err);
-      return next(err);
-    }
-    if (province.n === 0) {
-      res.status(httpStatus.NOTFOUND).send({ status: 'error', message: `${req.params.id} not found` });
-      return province;
-    }
-    res.status(httpStatus.OK).send({ status: 'success', message: `${req.params.id} deleted successfully` });
-    return null;
-  });
+  Province.deleteOne({ _id: req.params.id }).exec()
+    .then(result => {
+      if(result.n == 0){
+        res.status(httpStatus.NOTFOUND).send();
+      }else{
+        res.status(httpStatus.OK).send({ message: 'Successfully deleted', id: req.params.id });
+      }
+    }).catch(error => {
+      res.status(httpStatus.BADREQUEST).send(error.message);
+    });
 };
+
+
+
+
+
 
 // file upload (here csv) test
 exports.provinceCSVUpload = function provinceCSVUpload(req, res){
@@ -141,7 +126,7 @@ exports.provinceCSVUpload = function provinceCSVUpload(req, res){
         d_id: tempData.d_id,
         name: tempData.name,
         type: tempData.type
-      }).exec((err, data) => {
+      }).exec( async (err, data) => {
         if(err){ return next(err); };
         console.log('query result..' + data);
         // if(!result){
